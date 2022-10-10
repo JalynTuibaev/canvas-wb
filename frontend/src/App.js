@@ -1,10 +1,13 @@
 import React, {useState, useRef, useEffect} from 'react';
+import './App.css';
 
 const App = () => {
     const [state, setState] = useState({
         mouseDown: false,
         pixelsArray: []
     });
+
+    const [color, setColor] = useState('black');
 
     const ws = useRef(null);
     const canvas = useRef(null);
@@ -24,14 +27,14 @@ const App = () => {
 
             decodedArr.map(event => {
                 const context = canvas.current.getContext('2d');
-                const imageData = context.createImageData(1, 1);
-                const d = imageData.data;
-                d[0] = 0;
-                d[1] = 0;
-                d[2] = 0;
-                d[3] = 255;
 
-                context.putImageData(imageData, event.x, event.y);
+                context.beginPath();
+                context.arc(event.x,  event.y, 10, 0, 2*Math.PI, false);
+                context.fillStyle = event.color;
+                context.fill();
+                context.lineWidth = 1;
+                context.strokeStyle = event.color;
+                context.stroke();
             });
         };
     }, []);
@@ -46,20 +49,21 @@ const App = () => {
                     ...prevState,
                     pixelsArray: [...prevState.pixelsArray, {
                         x: clientX,
-                        y: clientY
+                        y: clientY,
+                        color,
                     }]
                 };
             });
 
             const context = canvas.current.getContext('2d');
-            const imageData = context.createImageData(1, 1);
-            const d = imageData.data;
-            d[0] = 0;
-            d[1] = 0;
-            d[2] = 0;
-            d[3] = 255;
 
-            context.putImageData(imageData, event.clientX, event.clientY);
+            context.beginPath();
+            context.arc(event.clientX,  event.clientY, 10, 0, 2*Math.PI, false);
+            context.fillStyle = color;
+            context.fill();
+            context.lineWidth = 1;
+            context.strokeStyle = color;
+            context.stroke();
         }
     };
 
@@ -84,6 +88,14 @@ const App = () => {
                 onMouseUp={mouseUpHandler}
                 onMouseMove={canvasMouseMoveHandler}
             />
+
+            <div className='color'>
+                <p>Choose color: </p>
+                <button onClick={() => setColor('black')} className='btn black'/>
+                <button onClick={() => setColor('yellow')} className='btn yellow'/>
+                <button onClick={() => setColor('green')} className='btn green'/>
+                <button onClick={() => setColor('red')} className='btn red'/>
+            </div>
         </div>
 
     );
